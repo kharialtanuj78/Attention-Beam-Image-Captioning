@@ -3,11 +3,11 @@ import numpy as np
 import h5py
 import json
 import torch
-from scipy.misc import imread, imresize
+from imageio import imread
+from PIL import Image
 from tqdm import tqdm
 from collections import Counter
 from random import seed, choice, sample
-
 
 def create_input_files(dataset, karpathy_json_path, image_folder, captions_per_image, min_word_freq, output_folder,
                        max_len=100):
@@ -116,7 +116,10 @@ def create_input_files(dataset, karpathy_json_path, image_folder, captions_per_i
                 if len(img.shape) == 2:
                     img = img[:, :, np.newaxis]
                     img = np.concatenate([img, img, img], axis=2)
-                img = imresize(img, (256, 256))
+                # Resize image to 256x256 using PIL
+                img = Image.fromarray(img)
+                img = img.resize((256, 256))
+                img = np.array(img)
                 img = img.transpose(2, 0, 1)
                 assert img.shape == (3, 256, 256)
                 assert np.max(img) <= 255
